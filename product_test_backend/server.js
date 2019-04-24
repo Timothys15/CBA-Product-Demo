@@ -2,7 +2,8 @@ console.log('SERVER IS STARTING YO');
 
 const express = require('express');
 const app = express();
-const server = app.listen(3000, listening);
+const PORT = 3000; // Specify a network port
+const server = app.listen(PORT, listening);
 const router = express.Router(); // Get express's router functions
 const bodyParser = require('body-parser');
 
@@ -12,7 +13,7 @@ const url = 'mongodb://localhost:27017'; // DB Connection URL
 const dbName = 'cba';// Database Name
 
 function listening() {
-    console.log("listening....");
+    console.log(`Server is running on port ${PORT} at 'http://localhost:${PORT}' (CTRL + C to exit)`);
 }
 
 app.use(bodyParser.json()); // Parse input text to JSON
