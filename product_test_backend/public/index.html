@@ -20,15 +20,18 @@
             </ul>
         </p>
     
+
+    <h2>Create a Model</h2>
+
     <div class="form_container1">
-        <form action="../src/postformprocess.js" method="post">
+        <form action="/create" method="post">
             <div class="form-container">
                 <label class="form_label"> Model Name: </label>
     
                 <div class="form_input_box"> 
-                    <input type="text" name="model_name" description"Model_Name" title="Model Name">
+                    <input type="text" name="model_name" description"Model_Name" title="Model Name" required pattern="[a-zA-Z0-9]{4,}">
                     <br><br>
-                </div>
+                </div> 
     
                 <label class="form_label"> Timestamp: </label>
                 <div class="form_input_box">
@@ -52,13 +55,13 @@
             <div class="form-container">
                 <label class="form_label"> Model ID: </label>    
                 <div class="form_input_box"> 
-                    <input type="text" name="model_id" description"Model_ID" title="Model ID">
+                    <input type="text" name="model_id" description"Model_ID" title="Model ID" required pattern="(S{1}\d{4})">
                     <br><br>
                 </div>
     
                 <label class="form_label"> Text: </label>
                 <div class="form_input_box">
-                    <input type="text" name="plain_text" description"Plain_Text" title="Plain Text">
+                    <input type="text" name="plain_text" description"Plain_Text" title="Plain Text" required pattern="{1,}">
                     <br><br>
                 </div>
 
@@ -70,5 +73,12 @@
         </form>
     </div>
 
+    <h2>Load MongoDB local Database: </h2>
+    <button onClick="return getDetails();"> LOAD DATA </button>
+    <div class="database_data_container">
+        <article class="input_items">
+            <div>'Model Name: </div>
+        </article>
+    </div>
     </body>
 </html>
