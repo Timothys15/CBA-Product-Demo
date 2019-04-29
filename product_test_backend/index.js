@@ -44,6 +44,41 @@ app.post('/create', function(req, res){
     res.redirect('/');
 });
 
+// Insert a document in to the db
+app.post('/input', function(req, res){
+    console.log("The information entered for the model: ", req.body);
+
+    var item = { //The docuemnt object to be inserted to the array
+        model_id: req.body.model_id,
+        plain_text: req.body.plain_text,
+        tokenized_text: null //set to null before being tokenized
+    };
+
+    item.tokenized_text = tokenizeDocument(item.plain_text);
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client){
+        assert.equal(null, err);
+
+        const db = client.db(dbName);
+
+        //This creates a collection if it does not already exist
+        db.collection('testing_database_#').insertOne(item, function(err, result) {
+            assert.equal(null, err);
+            console.log('Item has been successfully inserted');
+
+        });
+    });
+
+    res.redirect('/');
+});
+
+// USed to tokenize the input plain text data
+function tokenizeDocument(inputDoc) {
+    var tokenizedDoc = inputDoc.match(/(\w|([-+]?[0-9]*\.?[0-9]))+/g); //Match any word + any digit (float included)
+    console.log(tokenizedDoc);
+    return tokenizedDoc;
+}
+
 function getDetails() {
     var userInput = document.getElementById('model_name').value;
     alert(userInput);
