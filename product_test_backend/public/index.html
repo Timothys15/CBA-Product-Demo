@@ -51,17 +51,17 @@
 
     <h2>Add a document!</h2>
     <div class="form_container2">
-        <form action="../src/postformprocess.js" method="post">
+        <form action="/input" method="post">
             <div class="form-container">
                 <label class="form_label"> Model ID: </label>    
                 <div class="form_input_box"> 
-                    <input type="text" name="model_id" description"Model_ID" title="Model ID" required pattern="(S{1}\d{4})">
+                    <input type="text" name="model_id" description"Model_ID" title="Model ID">
                     <br><br>
                 </div>
     
                 <label class="form_label"> Text: </label>
                 <div class="form_input_box">
-                    <input type="text" name="plain_text" description"Plain_Text" title="Plain Text" required pattern="{1,}">
+                    <input type="text" name="plain_text" description"Plain_Text" title="Plain Text" required pattern="{1,}" style="height:200px;width:400px;resize:true">
                     <br><br>
                 </div>
 
