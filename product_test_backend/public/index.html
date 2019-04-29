@@ -80,5 +80,21 @@
             <div>'Model Name: </div>
         </article>
     </div>
+
+    <form action="/get-data" method="POST">
+        <h2>Search via Model ID </h2>
+        <label>Model ID:</label>
+        <div class="buttons_container">
+            <input type="text" name="inputID" description"Input ID" title="Search ID" required pattern="{1,}">
+            </br></br>
+        </div>
+            <button class="post_button" type="submit" value="search"> Search </button>
+
+        <div>
+            <p id="searchModelName">modelname</p>
+            <p id="searchTimestamp">timestamp</p>
+        </div>
+    </form>
+
     </body>
 </html>
