@@ -6,6 +6,12 @@
         content="text/html; 
         charset=utf-8" />
         <title> Index </title>
+
+        <!-- <script>
+            function getDetails() {
+                document.getElementById("result_container").innerHTML = document
+            }
+        </script> -->
     </head>
 
     <body>
@@ -24,7 +30,7 @@
     <h2>Create a Model</h2>
 
     <div class="form_container1">
-        <form action="/create" method="post">
+        <form action="/create" method="post" id="create_model_form">
             <div class="form-container">
                 <label class="form_label"> Model Name: </label>
     
@@ -51,7 +57,7 @@
 
     <h2>Add a document!</h2>
     <div class="form_container2">
-        <form action="../src/postformprocess.js" method="post">
+        <form action="/add-document" method="post">
             <div class="form-container">
                 <label class="form_label"> Model ID: </label>    
                 <div class="form_input_box"> 
@@ -61,7 +67,7 @@
     
                 <label class="form_label"> Text: </label>
                 <div class="form_input_box">
-                    <input type="text" name="plain_text" description"Plain_Text" title="Plain Text" required pattern="{1,}">
+                    <input type="textarea" rows="4" cols="50" name="plain_text" description"Plain_Text" title="Plain Text" required pattern="{1,}">
                     <br><br>
                 </div>
 
@@ -74,27 +80,13 @@
     </div>
 
     <h2>Load MongoDB local Database: </h2>
-    <button onClick="return getDetails();"> LOAD DATA </button>
-    <div class="database_data_container">
-        <article class="input_items">
-            <div>'Model Name: </div>
-        </article>
-    </div>
+        <a href="/get-service1-data"><button> 
+            Load Service 1 (Create a Model)
+        </button></a>
+        <!-- <input type="submit" return false" placeholder="LOAD DATA"> -->
 
-    <form action="/get-data" method="POST">
-        <h2>Search via Model ID </h2>
-        <label>Model ID:</label>
-        <div class="buttons_container">
-            <input type="text" name="inputID" description"Input ID" title="Search ID" required pattern="{1,}">
-            </br></br>
-        </div>
-            <button class="post_button" type="submit" value="search"> Search </button>
-
-        <div>
-            <p id="searchModelName">modelname</p>
-            <p id="searchTimestamp">timestamp</p>
-        </div>
-    </form>
-
+    <a href="/get-service2-data"><button> 
+        Load Service 2 (Add a Document)
+    </button></a>
     </body>
 </html>
