@@ -1,4 +1,4 @@
-var express = require ('express');
+var express = require('express');
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 var assert = require('assert');
@@ -6,6 +6,9 @@ var dbName = 'CBA_Project';     // Database Name, change this to the name of you
 var collectionOne = 'Create_Model_Collection';
 var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
+
+var fs = require('fs');
+var Tokenizr = require('tokenizr');
 
 var app = express();
 
@@ -15,13 +18,13 @@ app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL en
 app.get('/get-service1-data', function (req, res) {
     //The data from the MongoDB is loaded into data_array
 
-    MongoClient.connect(url, {useNewUrlParser: true }, function (err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var data_array = [];
         var db = client.db(dbName);
 
-        db.collection(`${collectionOne}`).find().toArray(function(err, result) {
-            if(err) throw err;
+        db.collection(`${collectionOne}`).find().toArray(function (err, result) {
+            if (err) throw err;
             console.log(result.model_name, result);
             client.close();
             res.send(result);
@@ -30,13 +33,13 @@ app.get('/get-service1-data', function (req, res) {
 })
 
 app.get('/get-service2-data', function (req, res) {
-    MongoClient.connect(url, {useNewUrlParser: true }, function (err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var data_array = [];
         var db = client.db(dbName);
 
-        db.collection(`${collectionTwo}`).find().toArray(function(err, result) {
-            if(err) throw err;
+        db.collection(`${collectionTwo}`).find().toArray(function (err, result) {
+            if (err) throw err;
             console.log(result.model_id, result);
             client.close();
             res.send(result);
@@ -47,20 +50,20 @@ app.get('/get-service2-data', function (req, res) {
 
 //inserting into MongoDB must be in the curly braces of the app.post
 //Accepts the inputs from create a model form box
-app.post('/create', function(req, res){
+app.post('/create', function (req, res) {
     console.log("The information entered is: ", req.body);
     var item = {
         model_name: req.body.model_name,
         timestamp: req.body.timestamp
     };
 
-    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
 
         const db = client.db(dbName);
 
         //This creates a collection if it does not already exist
-        db.collection(`${collectionOne}`).insertOne(item, function(err, result) {
+        db.collection(`${collectionOne}`).insertOne(item, function (err, result) {
             assert.equal(null, err);
             console.log(`Item has been successfully inserted into ${collectionOne}.`);
 
@@ -70,32 +73,65 @@ app.post('/create', function(req, res){
     res.redirect('/');
 });
 
-app.post('/add-document', function(req, res){
+app.post('/add-document', function (req, res) {
     console.log("The information entered is: ", req.body);
     var item = {
         model_id: req.body.model_id,
-        plain_text: req.body.plain_text
+        plain_text: req.body.plain_text,
+        tokenized_text: tokenizeDocument(req.body.plain_text)
     };
 
-    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
 
         const db = client.db(dbName);
 
         //This creates a collection if it does not already exist
-        db.collection(`${collectionTwo}`).insertOne(item, function(err, result) {
+        db.collection(`${collectionTwo}`).insertOne(item, function (err, result) {
             assert.equal(null, err);
             console.log(`Item has been successfully inserted into ${collectionTwo}.`);
 
         });
     });
-
     res.redirect('/');
 });
 
 // USed to tokenize the input plain text data
 function tokenizeDocument(inputDoc) {
-    var tokenizedDoc = inputDoc.match(/(\w|([-+]?[0-9]*\.?[0-9]))+/g); //Match any word + any digit (float included)
+
+    let lexer = new Tokenizr();
+    var tokenizedDoc = [];
+
+    lexer.rule(/[a-zA-Z]['a-zA-Z]*/, (ctx, match) => { //word
+        ctx.accept("0")
+    })
+    lexer.rule(/[-+]?[0-9]\.?[0-9]+/, (ctx, match) => { //number match
+        ctx.accept("0")
+    })    
+    lexer.rule(/[ \t\r\n]+/, (ctx, match) => { //ignore space, new lines, tabs, returns
+        ctx.ignore()
+    })
+    lexer.rule(/./, (ctx, match) => { // chars
+        ctx.accept("0")
+    })
+
+    let cfg = inputDoc;
+    lexer.input(cfg);
+
+    var splittedToken = [];
+    var usableToken = "";
+
+    lexer.tokens().forEach((token) => {
+        splittedToken = token.toString().split(", text");
+        usableToken = splittedToken[0].substr(1, splittedToken[0].length); //Removes < from the front of string
+
+        splittedToken = usableToken.split((" ")); //Split token into 4 lots
+        splittedToken[3] = splittedToken[3].replace(/^"(.*)"$/, '$1'); //Remove the "" surrounding the value
+       
+        usableToken = splittedToken.join(" "); // Join the token back up
+        tokenizedDoc.push(usableToken); //Push into array
+    });
+
     console.log(tokenizedDoc);
     return tokenizedDoc;
 }
