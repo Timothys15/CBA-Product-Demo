@@ -15,6 +15,10 @@ var app = express();
 app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/get-service1-data', function (req, res) {
     //The data from the MongoDB is loaded into data_array
 
@@ -44,6 +48,29 @@ app.get('/get-service2-data', function (req, res) {
             client.close();
             res.send(result);
         });
+    });
+})
+
+app.get('/get-data/:modelName', function(req, res) {
+
+    var inputName = {model_name: req.params.modelName};
+    console.log(inputName);
+    //console.log("id.model_name + ' ' + id.timestamp");
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client){
+        assert.equal(null, err);
+        var resultArray = [];
+        var db = client.db(dbName);
+        //console.log(inputName);
+        console.log("db: " + db.databaseName);
+
+        db.collection(`${collectionTwo}`).find(inputName).toArray(function(err, result){
+            if(err) throw err;
+            console.log(result);
+            res.end(JSON.stringify( result));
+            client.close();
+            res.send(result);
+        });    
     });
 })
 
