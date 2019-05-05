@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = 8080; // Specify a network port
+const PORT = 3000; // Specify a network port
 const server = app.listen(PORT, listening);
 const bodyParser = require('body-parser');
 const routes = require('./index');

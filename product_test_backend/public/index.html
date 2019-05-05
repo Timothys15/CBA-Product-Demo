@@ -51,11 +51,12 @@
 
     <h2>Add a document!</h2>
     <div class="form_container2">
-        <form action="../src/postformprocess.js" method="post">
+        <form action="/add-document" method="post">
             <div class="form-container">
-                <label class="form_label"> Model ID: </label>    
+                <label class="form_label"> Model name: </label>    
                 <div class="form_input_box"> 
-                    <input type="text" name="model_id" description"Model_ID" title="Model ID" required pattern="(S{1}\d{4})">
+                    <!--//required pattern="(S{1}\d{4})"-->
+                    <input type="text" name="model_name" description"Model_ID" title="Model Name" > 
                     <br><br>
                 </div>
     
@@ -82,8 +83,8 @@
     </div>
 
     <form action="/get-data" method="POST">
-        <h2>Search via Model ID </h2>
-        <label>Model ID:</label>
+        <h2>Search via Model Name </h2>
+        <label>Model Name:</label>
         <div class="buttons_container">
             <input type="text" name="inputID" description"Input ID" title="Search ID" required pattern="{1,}">
             </br></br>
