@@ -2,11 +2,15 @@ var express = require ('express');
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 var assert = require('assert');
-var dbName = 'CBA_Project';     // Database Name, change this to the name of your local MongoDB database
+
+var dbName = 'testing';     // Database Name, change this to the name of your local MongoDB database
 var url = `mongodb://localhost:27017/${dbName}`;
 var ObjectID = require('mongodb').ObjectID;
 var collectionOne = 'create_Model_Collection';
 var collectionTwo = 'add_Document_Collection';
+
+var fs = require('fs');
+var Tokenizr = require('tokenizr');
 
 var app = express();
 var item;
