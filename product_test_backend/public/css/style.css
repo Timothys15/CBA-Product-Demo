@@ -152,13 +152,13 @@ input[type=text] {
     text-decoration: none;
     outline: none;
     color: #fff;
-    background-color: #4CAF50;
+    background-color: #66e0ff;
     border: none;
     border-radius: 15px;
     box-shadow: 0 9px #999;
 }
 
-.load_button:hover {background-color: #3e8e41}
+.load_button:hover {background-color: #00a3cc}
 
 .load_button:active {
   background-color: #3e8e41;
@@ -212,7 +212,7 @@ input[type=text] {
     max-width: 500px;
     padding: 10px;
     float: left;
-    background: #e0ccff;
+    background: #a3a3c2;
     padding: 10px;
     margin: 30px;
     width: 400px;
