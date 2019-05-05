@@ -74,28 +74,52 @@
         </form>
     </div>
 
-    <h2>Load MongoDB local Database: </h2>
-    <button onClick="return getDetails();"> LOAD DATA </button>
-    <div class="database_data_container">
-        <article class="input_items">
-            <div>'Model Name: </div>
-        </article>
-    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-    <form action="/get-data" method="POST">
+    <script type="text/javascript">
+        $(document).ready(() => {
+            $('#searchName').click(() => {
+                var getDataUrl = 'get-data/'+ $("#testtextbox").val();
+                $.ajax({
+                    url: getDataUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: (data) => {
+                        var result = `<h2>`+$("#testtextbox").val()+` Documents</h2>`;
+                        var docNum = 1;
+
+                        data.forEach((entry) => {
+                            const { _id, model_name, plain_text, tokenized_text } = entry;
+                            
+                            result +=
+                                `<div>
+                                    <h4>Document ${docNum}</h4>
+                                        <ul>
+                                           <li>Plain Text: ${plain_text}</li>
+                                        </ul>
+                                </div>`;
+
+                            docNum++;
+                            
+                            document.getElementById('displayDocs').innerHTML = result;
+                        });
+
+                    }
+                });   
+            });
+        });
+    </script>    
+
         <h2>Search via Model Name </h2>
         <label>Model Name:</label>
         <div class="buttons_container">
-            <input type="text" name="inputID" description"Input ID" title="Search ID" required pattern="{1,}">
+            <input type="text" id="testtextbox" name="inputName" description="Input ID" title="Search ID" >
             </br></br>
+            <button id="searchName" class="post_button" type="button" value="search"> Search </button>
         </div>
-            <button class="post_button" type="submit" value="search"> Search </button>
+        
+    <p id="displayDocs"></p>
 
-        <div>
-            <p id="searchModelName">modelname</p>
-            <p id="searchTimestamp">timestamp</p>
-        </div>
-    </form>
 
     </body>
 </html>

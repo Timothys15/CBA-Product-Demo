@@ -23,27 +23,35 @@ var item;
 app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 
-app.get('/get-data', function (req, res) {
+app.get('/get-data/:modelName', function(req, res) {
 
-    var inputName = req.body.id;
-
+    var inputName = {model_name: req.params.modelName};
+    console.log(inputName);
     //console.log("id.model_name + ' ' + id.timestamp");
 
-    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client){
         assert.equal(null, err);
         var resultArray = [];
         var db = client.db(dbName);
+        //console.log(inputName);
         console.log("db: " + db.databaseName);
 
-        db.collection(`${collectionOne}`).find(inputName).toArray(function(err, result) {
+       /*db.collection(`${collectionOne}`).find(inputName).toArray(function(err, result1) {
             if(err) throw err;
-            console.log(result.model_name, result);
+            console.log(result1);
             client.close();
-            res.send(result);
+        });*/
+        db.collection(`${collectionTwo}`).find(inputName).toArray(function(err, result){
+            if(err) throw err;
+            console.log(result);
+            res.end(JSON.stringify( result));
+            client.close();
         });
+        
+
     });
-    //res.redirect('/');
 })
+
 
 //inserting into MongoDB must be in the curly braces of the app.post
 //Accepts the inputs from create a model form box
