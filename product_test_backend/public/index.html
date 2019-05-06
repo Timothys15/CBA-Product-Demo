@@ -87,6 +87,7 @@
                     success: (data) => {
                         var result = `<h2>`+$("#testtextbox").val()+` Documents</h2>`;
                         var docNum = 1;
+                        var tokenNum = 1;
 
                         data.forEach((entry) => {
                             const { _id, model_name, plain_text, tokenized_text } = entry;
@@ -95,7 +96,14 @@
                                 `<div>
                                     <h4>Document ${docNum}</h4>
                                         <ul>
-                                           <li>Plain Text: ${plain_text}</li>
+                                           <li>Plain Text: ${plain_text}</li>`+
+                                            tokenized_text.forEach((token) => {
+                                                var keys = Object.keys(token);
+                                                //const { type, value } = token;
+
+                                                `<li>Token ${tokenNum}: ${keys}</li>`
+                                            })
+                                           +`
                                         </ul>
                                 </div>`;
 
