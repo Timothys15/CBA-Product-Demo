@@ -2,7 +2,7 @@ var express = require('express');
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 var assert = require('assert');
-var dbName = 'CBA_Project';     // Database Name, change this to the name of your local MongoDB database
+var dbName = 'testing';     // Database Name, change this to the name of your local MongoDB database
 var collectionOne = 'Create_Model_Collection';
 var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
@@ -69,7 +69,6 @@ app.get('/get-data/:modelName', function(req, res) {
             console.log(result);
             res.end(JSON.stringify( result));
             client.close();
-            res.send(result);
         });    
     });
 })
