@@ -51,25 +51,25 @@ app.get('/get-service2-data', function (req, res) {
     });
 })
 
-app.get('/get-data/:modelName', function(req, res) {
+app.get('/get-data/:modelName', function (req, res) {
 
-    var inputName = {model_name: req.params.modelName};
+    var inputName = { model_name: req.params.modelName };
     console.log(inputName);
     //console.log("id.model_name + ' ' + id.timestamp");
 
-    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var resultArray = [];
         var db = client.db(dbName);
         //console.log(inputName);
         console.log("db: " + db.databaseName);
 
-        db.collection(`${collectionTwo}`).find(inputName).toArray(function(err, result){
-            if(err) throw err;
+        db.collection(`${collectionTwo}`).find(inputName).toArray(function (err, result) {
+            if (err) throw err;
             console.log(result);
-            res.end(JSON.stringify( result));
+            res.end(JSON.stringify(result));
             client.close();
-        });    
+        });
     });
 })
 
@@ -133,7 +133,7 @@ function tokenizeDocument(inputDoc) {
     })
     lexer.rule(/[-+]?[0-9]\.?[0-9]+/, (ctx, match) => { //number match
         ctx.accept("0")
-    })    
+    })
     lexer.rule(/[ \t\r\n]+/, (ctx, match) => { //ignore space, new lines, tabs, returns
         ctx.ignore()
     })
@@ -160,7 +160,23 @@ function tokenizeDocument(inputDoc) {
     });
 
     console.log(tokenizedDoc);
+    saveToDoc(tokenizedDoc);
     return tokenizedDoc;
+}
+
+function saveToDoc(data) {
+
+    var logger = fs.createWriteStream('log.txt', {
+        flags: 'a' // 'a' means appending (old data will be preserved)
+    });
+
+    for (var i = 0; i < data.length; i++) {
+        if (i === data.length-1) {
+            logger.write("\r\n");
+        } else {
+            logger.write(data[i].substr(0, data[i].length - 1) + "\r\n");
+        }
+    }
 }
 
 function getDetails() {
