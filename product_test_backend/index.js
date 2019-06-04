@@ -2,7 +2,7 @@ var express = require('express');
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser');
 var assert = require('assert');
-var dbName = 'CBA_Project';     // Database Name, change this to the name of your local MongoDB database
+var dbName = 'testing';     // Database Name, change this to the name of your local MongoDB database
 var collectionOne = 'Create_Model_Collection';
 var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
@@ -14,6 +14,10 @@ var app = express();
 
 app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
+
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html');
+});
 
 app.get('/get-service1-data', function (req, res) {
     //The data from the MongoDB is loaded into data_array
@@ -44,6 +48,28 @@ app.get('/get-service2-data', function (req, res) {
             client.close();
             res.send(result);
         });
+    });
+})
+
+app.get('/get-data/:modelName', function(req, res) {
+
+    var inputName = {model_name: req.params.modelName};
+    console.log(inputName);
+    //console.log("id.model_name + ' ' + id.timestamp");
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client){
+        assert.equal(null, err);
+        var resultArray = [];
+        var db = client.db(dbName);
+        //console.log(inputName);
+        console.log("db: " + db.databaseName);
+
+        db.collection(`${collectionTwo}`).find(inputName).toArray(function(err, result){
+            if(err) throw err;
+            console.log(result);
+            res.end(JSON.stringify( result));
+            client.close();
+        });    
     });
 })
 
@@ -120,6 +146,7 @@ function tokenizeDocument(inputDoc) {
 
     var splittedToken = [];
     var usableToken = "";
+    var tempToken = "";
 
     lexer.tokens().forEach((token) => {
         splittedToken = token.toString().split(", text");
@@ -127,9 +154,9 @@ function tokenizeDocument(inputDoc) {
 
         splittedToken = usableToken.split((" ")); //Split token into 4 lots
         splittedToken[3] = splittedToken[3].replace(/^"(.*)"$/, '$1'); //Remove the "" surrounding the value
-       
-        usableToken = splittedToken.join(" "); // Join the token back up
-        tokenizedDoc.push(usableToken); //Push into array
+        tempToken = splittedToken[3] + "\t" + splittedToken[1];
+
+        tokenizedDoc.push(tempToken); //Push into array
     });
 
     console.log(tokenizedDoc);
