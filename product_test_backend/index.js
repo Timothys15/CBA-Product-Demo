@@ -146,6 +146,7 @@ function tokenizeDocument(inputDoc) {
 
     var splittedToken = [];
     var usableToken = "";
+    var tempToken = "";
 
     lexer.tokens().forEach((token) => {
         splittedToken = token.toString().split(", text");
@@ -153,9 +154,9 @@ function tokenizeDocument(inputDoc) {
 
         splittedToken = usableToken.split((" ")); //Split token into 4 lots
         splittedToken[3] = splittedToken[3].replace(/^"(.*)"$/, '$1'); //Remove the "" surrounding the value
-       
-        usableToken = splittedToken.join(" "); // Join the token back up
-        tokenizedDoc.push(usableToken); //Push into array
+        tempToken = splittedToken[3] + "\t" + splittedToken[1];
+
+        tokenizedDoc.push(tempToken); //Push into array
     });
 
     console.log(tokenizedDoc);
