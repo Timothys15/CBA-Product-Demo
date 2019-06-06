@@ -1,5 +1,6 @@
 var express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
 var assert = require('assert');
 var dbName = 'testing';     // Database Name, change this to the name of your local MongoDB database
@@ -17,6 +18,10 @@ app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL en
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/annotate', function (req, res) {
+    res.sendFile(__dirname + '/document_annotate.html');
 });
 
 app.get('/get-service1-data', function (req, res) {
@@ -68,6 +73,26 @@ app.get('/get-data/:modelName', function (req, res) {
             if (err) throw err;
             console.log(result);
             res.end(JSON.stringify(result));
+            client.close();
+        });
+    });
+})
+
+app.get('/document/:id', function (req, res) {
+    var docId = req.params.id;
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        assert.equal(null, err);
+        var db = client.db(dbName);
+
+        db.collection(`${collectionTwo}`).findOne({ _id: new ObjectId(docId) }, function (err, document) {
+            var temp = [{ id: "", value: "" }];
+            var splitWord = [];
+            document.tokenized_text.forEach(element => {
+                splitWord = element.split(("\t"));
+                temp.push({id:splitWord[0], value:splitWord[1]})
+                document.tokenized_text = temp;
+            });
+            res.end(JSON.stringify(document));
             client.close();
         });
     });
@@ -154,7 +179,7 @@ function tokenizeDocument(inputDoc) {
 
         splittedToken = usableToken.split((" ")); //Split token into 4 lots
         splittedToken[3] = splittedToken[3].replace(/^"(.*)"$/, '$1'); //Remove the "" surrounding the value
-        tempToken = splittedToken[3] + "\t" + splittedToken[1];
+        tempToken = splittedToken[3] + "\t" + splittedToken[1].substr(0,splittedToken[1].length-1);
 
         tokenizedDoc.push(tempToken); //Push into array
     });
@@ -171,7 +196,7 @@ function saveToDoc(data) {
     });
 
     for (var i = 0; i < data.length; i++) {
-        if (i === data.length-1) {
+        if (i === data.length - 1) {
             logger.write("\r\n");
         } else {
             logger.write(data[i].substr(0, data[i].length - 1) + "\r\n");
