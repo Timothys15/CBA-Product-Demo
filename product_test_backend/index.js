@@ -1,5 +1,6 @@
 var express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
 var assert = require('assert');
 var dbName = 'testing';     // Database Name, change this to the name of your local MongoDB database
@@ -17,6 +18,10 @@ app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL en
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/annotate', function (req, res) {
+    res.sendFile(__dirname + '/document_annotate.html');
 });
 
 app.get('/get-service1-data', function (req, res) {
@@ -51,27 +56,70 @@ app.get('/get-service2-data', function (req, res) {
     });
 })
 
-app.get('/get-data/:modelName', function(req, res) {
+app.get('/get-data/:modelName', function (req, res) {
 
-    var inputName = {model_name: req.params.modelName};
+    var inputName = { model_name: req.params.modelName };
     console.log(inputName);
     //console.log("id.model_name + ' ' + id.timestamp");
 
-    MongoClient.connect(url, { useNewUrlParser: true }, function(err, client){
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var resultArray = [];
         var db = client.db(dbName);
         //console.log(inputName);
         console.log("db: " + db.databaseName);
 
-        db.collection(`${collectionTwo}`).find(inputName).toArray(function(err, result){
-            if(err) throw err;
+        db.collection(`${collectionTwo}`).find(inputName).toArray(function (err, result) {
+            if (err) throw err;
             console.log(result);
-            res.end(JSON.stringify( result));
+            res.end(JSON.stringify(result));
             client.close();
-        });    
+        });
     });
 })
+
+app.get('/getAllDocuments', function(req,res) {
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        assert.equal(null, err);
+        var db = client.db(dbName);
+
+        db.collection(`${collectionTwo}`).find({}, { projection: { _id: 1, model_id: 1} }).toArray( function (err, document) {
+            if (err) throw err;
+
+            res.send(JSON.stringify(document));
+            client.close();
+        });
+    });
+
+})
+
+app.get('/document/:id', function (req, res) {
+    var docId = req.params.id;
+    console.log(docId);
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        assert.equal(null, err);
+        var db = client.db(dbName);
+
+        db.collection(`${collectionTwo}`).findOne({ _id: new ObjectId(docId) }, function (err, document) {
+            var temp = [{ id: "", value: "" }];
+            var splitWord = [];
+            document.tokenized_text.forEach(element => {
+                splitWord = element.split(("\t"));
+                temp.push({id:splitWord[0], value:splitWord[1]})
+                document.tokenized_text = temp;
+            });
+            res.end(JSON.stringify(document));
+            client.close();
+        });
+    });
+})
+
+app.post('/update/:id', function(req, res) {
+    console.log(req.body);
+})
+
+
 
 
 //inserting into MongoDB must be in the curly braces of the app.post
@@ -133,7 +181,7 @@ function tokenizeDocument(inputDoc) {
     })
     lexer.rule(/[-+]?[0-9]\.?[0-9]+/, (ctx, match) => { //number match
         ctx.accept("0")
-    })    
+    })
     lexer.rule(/[ \t\r\n]+/, (ctx, match) => { //ignore space, new lines, tabs, returns
         ctx.ignore()
     })
@@ -154,13 +202,29 @@ function tokenizeDocument(inputDoc) {
 
         splittedToken = usableToken.split((" ")); //Split token into 4 lots
         splittedToken[3] = splittedToken[3].replace(/^"(.*)"$/, '$1'); //Remove the "" surrounding the value
-        tempToken = splittedToken[3] + "\t" + splittedToken[1];
+        tempToken = splittedToken[3] + "\t" + splittedToken[1].substr(0,splittedToken[1].length-1);
 
         tokenizedDoc.push(tempToken); //Push into array
     });
 
     console.log(tokenizedDoc);
+    saveToDoc(tokenizedDoc);
     return tokenizedDoc;
+}
+
+function saveToDoc(data) {
+
+    var logger = fs.createWriteStream('log.txt', {
+        flags: 'a' // 'a' means appending (old data will be preserved)
+    });
+
+    for (var i = 0; i < data.length; i++) {
+        if (i === data.length - 1) {
+            logger.write("\r\n");
+        } else {
+            logger.write(data[i].substr(0, data[i].length - 1) + "\r\n");
+        }
+    }
 }
 
 function getDetails() {

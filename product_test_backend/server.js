@@ -16,7 +16,7 @@ function listening() {
 app.use('/', routes);
 app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
-app.use(express.static('public'));
+app.use("/public", express.static('./public'));
 
 //DB connect
 MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
