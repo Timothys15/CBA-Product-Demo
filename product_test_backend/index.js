@@ -78,8 +78,25 @@ app.get('/get-data/:modelName', function (req, res) {
     });
 })
 
+app.get('/getAllDocuments', function(req,res) {
+
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        assert.equal(null, err);
+        var db = client.db(dbName);
+
+        db.collection(`${collectionTwo}`).find({}, { projection: { _id: 1, model_id: 1} }).toArray( function (err, document) {
+            if (err) throw err;
+
+            res.send(JSON.stringify(document));
+            client.close();
+        });
+    });
+
+})
+
 app.get('/document/:id', function (req, res) {
     var docId = req.params.id;
+    console.log(docId);
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var db = client.db(dbName);
@@ -97,6 +114,12 @@ app.get('/document/:id', function (req, res) {
         });
     });
 })
+
+app.post('/update/:id', function(req, res) {
+    console.log(req.body);
+})
+
+
 
 
 //inserting into MongoDB must be in the curly braces of the app.post

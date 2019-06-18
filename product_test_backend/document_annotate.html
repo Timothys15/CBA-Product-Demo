@@ -5,22 +5,14 @@
 <head>
     <meta http-equiv="content-type" content="text/html; 
         charset=utf-8" />
-    <title> Document Annotation </title>
-
+    <title> Document Annotation </title>    
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"
-        defer></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"
-        defer></script>
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 
-<body>
+<body onload="getDocuments()">
     <div class="containter">
         <div class="row">
             <div class="col">
@@ -31,18 +23,14 @@
         <div class="row" style="margin: auto">
             <div class="col-md-3" id="docChoice">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-10">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col">Documents:</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">Document 1</th>
-                                    <th><button id="getDoc">Go</button></th>
-                                </tr>
+                            <tbody id="documentTable">
                             </tbody>
                         </table>
                     </div>
@@ -83,53 +71,11 @@
         </div>
     </div>
 
-    <script type="text/javascript">
-        function match(){
-            console.log(document.getElementById("documentTextArea").value);
-            console.log(document.getElementById("entitySelect").value);
-        }
-    </script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="public/js/scripts.js"></script>
 
-    <script type="text/javascript">
-        $('#getDoc').click(() => {
-            var getDataUrl = 'document/5cf87d6cf1ad06089c56cdfa';
-            $.ajax({
-                url: getDataUrl,
-                type: 'GET',
-                dataType: 'JSON',
-                success: (data) => {
-                    var docNum = 1;
-                    const { _id, model_name, plain_text, tokenized_text } = data;
-
-                    var builtText = "";
-                    tokenized_text.forEach(element => {
-                        if (/^[.]*$/.test(element._id)) {
-                            builtText += (element._id + " ");
-                        } else {
-                            if (element.value === "PERSON") {
-                                builtText += ` <i style='background-color:yellow;'>${element.id}</i>`
-                            } else if (element.value === "ORGANIZATION") {
-                                builtText += ` <i style='background-color:blue;'>${element.id}</i>`
-                            } else if (element.value === "LOCATION") {
-                                builtText += ` <i style='background-color:red;'>${element.id}</i>`
-                            } else {
-                                builtText += (" " + element.id);
-                            }
-                        }
-                    });
-
-                    result =
-                    //TODO: change this all to appending to the DOM instead of hard coded
-                        `<div> 
-                                <h4 class="text-center">Document ${_id}</h4>
-                                <br />
-                                <p>${builtText}</p>
-                            </div>`;
-                    document.getElementById('documentTextArea').innerHTML = result;
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>
