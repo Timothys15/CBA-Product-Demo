@@ -1,5 +1,4 @@
 function updateTextArea(data) {
-    var docNum = 1;
     const { _id, model_id, plain_text, tokenized_text } = data;
 
     var builtText = "";
@@ -30,30 +29,31 @@ function updateTextArea(data) {
 }
 
 function match() {
-    
-    var data = {
-        docID: document.getElementById("docName").getAttribute("value"),
-        docName: document.getElementById("docName").innerHTML,
-        word: document.getElementById("word").value,
-        value: document.getElementById("entitySelect").value,
+
+    if(!document.getElementById("docName")){
+        alert("Please choose a document first");
+    } else if (document.getElementById("word").value === ''){
+        alert("Please pick a word to assign an entity to");
+    } else {
+        var data = {
+            docID: document.getElementById("docName").getAttribute("value"),
+            docName: document.getElementById("docName").innerHTML,
+            word: document.getElementById("word").value,
+            value: document.getElementById("entitySelect").value,
+        }
+
+        var postDataUrl = '/update/entity/'+data.docID+'/'+data.word+'/'+data.value;
+        $.ajax({
+            url: postDataUrl,
+            type: 'POST',
+            data: data,
+            dataType: 'JSON',
+            success: (result) => {   
+                getDoc(data.docID);
+            }
+        });       
     }
 
-/*     var temp = document.getElementById('textDisplayed').innerText;
-    console.log(temp);
-    console.log(temp.indexOf(data.word));
-    console.log(temp[temp.indexOf(data.word)]); */
-
-    var postDataUrl = '/update/entity/'+data.docID+'/'+data.word+'/'+data.value;
-    $.ajax({
-        url: postDataUrl,
-        type: 'POST',
-        data: data,
-        dataType: 'JSON',
-        success: (result) => {   
-            console.log(result);
-            getDoc(data.docID);
-        }
-    });
 }
 
 function getDocuments() {
@@ -93,7 +93,6 @@ $(function() {
 });
 
 function getDoc(doc) {
-    console.log("here")
     var getDataUrl = "document/" + doc;
     $.ajax({
         url: getDataUrl,
