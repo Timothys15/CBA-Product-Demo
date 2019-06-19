@@ -118,7 +118,6 @@ app.get('/document/:id', function (req, res) {
 
 app.post('/update/entity/:id/:word/:entity', function (req, res) {
     var docInfo = req.body;
-    console.log(docInfo);
     fetch(`http://127.0.0.1:8080/document/${docInfo.docID}`)
         .then(res => res.json())
         .then(function (data) {
