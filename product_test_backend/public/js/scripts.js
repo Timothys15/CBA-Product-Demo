@@ -1,6 +1,6 @@
 function updateTextArea(data) {
     var docNum = 1;
-    const { _id, model_name, plain_text, tokenized_text } = data;
+    const { _id, model_id, plain_text, tokenized_text } = data;
 
     var builtText = "";
     tokenized_text.forEach(element => {
@@ -22,7 +22,7 @@ function updateTextArea(data) {
     result =
         //TODO: change this all to appending to the DOM instead of hard coded
         `<div> 
-                    <h4 class="text-center" id="docId">${_id}</h4>
+                    <h4 class="text-center" id="docName" value=${_id}>${model_id}</h4>
                     <br />
                     <p id="textDisplayed">${builtText}</p>
                 </div>`;
@@ -30,28 +30,28 @@ function updateTextArea(data) {
 }
 
 function match() {
-    console.log("here");
-    console.log(document.getElementById("word").value);
-    console.log(document.getElementById("entitySelect").value);
-    console.log(document.getElementById("docId").innerHTML);
-    var postDataUrl = 'update/5cf87d6cf1ad06089c56cdfa';
+    
     var data = {
-        id: document.getElementById("docId").innerHTML,
+        docID: document.getElementById("docName").getAttribute("value"),
+        docName: document.getElementById("docName").innerHTML,
         word: document.getElementById("word").value,
         value: document.getElementById("entitySelect").value,
     }
-    var temp = document.getElementById('textDisplayed').innerText;
+
+/*     var temp = document.getElementById('textDisplayed').innerText;
     console.log(temp);
     console.log(temp.indexOf(data.word));
-    console.log(temp[temp.indexOf(data.word)]);
+    console.log(temp[temp.indexOf(data.word)]); */
 
-
+    var postDataUrl = '/update/entity/'+data.docID+'/'+data.word+'/'+data.value;
     $.ajax({
         url: postDataUrl,
         type: 'POST',
         data: data,
         dataType: 'JSON',
-        success: (data) => {
+        success: (result) => {   
+            console.log(result);
+            getDoc(data.docID);
         }
     });
 }
@@ -62,8 +62,6 @@ function getDocuments() {
         type: 'GET',
         dataType: 'JSON',
         success: (data) => {
-            console.log(data);
-
             const theTable = document.getElementById("documentTable");
             const ButtonText = "Go";
 
@@ -84,21 +82,19 @@ function getDocuments() {
 
                 theTable.appendChild(newRow);
             })
-
         }
     });
 }
 
 $(function() {
     $(document).on("click", '#docButt[value]', function() {
-        console.log(this.value);
         getDoc(this.value);
     });
 });
 
 function getDoc(doc) {
+    console.log("here")
     var getDataUrl = "document/" + doc;
-    console.log(getDataUrl);
     $.ajax({
         url: getDataUrl,
         type: 'GET',
