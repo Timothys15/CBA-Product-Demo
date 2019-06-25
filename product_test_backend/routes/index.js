@@ -8,6 +8,7 @@ var collectionOne = 'Create_Model_Collection';
 var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
 const fetch = require("node-fetch");
+var path = require('path');
 
 var fs = require('fs');
 var Tokenizr = require('tokenizr');
@@ -18,7 +19,7 @@ app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(path.join(__dirname , '../views','/index.html'));
 });
 
 app.get('/get-service1-data', function (req, res) {
