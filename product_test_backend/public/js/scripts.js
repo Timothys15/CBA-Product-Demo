@@ -29,31 +29,36 @@ function updateTextArea(data) {
 }
 
 function match() {
-
     if(!document.getElementById("docName")){
         alert("Please choose a document first");
     } else if (document.getElementById("word").value === ''){
         alert("Please pick a word to assign an entity to");
     } else {
-        var data = {
-            docID: document.getElementById("docName").getAttribute("value"),
-            docName: document.getElementById("docName").innerHTML,
-            word: document.getElementById("word").value,
-            value: document.getElementById("entitySelect").value,
-        }
-
-        var postDataUrl = '/update/entity/'+data.docID+'/'+data.word+'/'+data.value;
-        $.ajax({
-            url: postDataUrl,
-            type: 'POST',
-            data: data,
-            dataType: 'JSON',
-            success: (result) => {   
-                getDoc(data.docID);
+        var wordList = document.getElementById("word").value.match(/[-+]?[0-9]\.?[0-9]+|\w+|\S/g);
+        
+        if(wordList.length === 1){
+            var data = {
+                docID: document.getElementById("docName").getAttribute("value"),
+                docName: document.getElementById("docName").innerHTML,
+                word: document.getElementById("word").value,
+                value: document.getElementById("entitySelect").value,
             }
-        });       
+            var postDataUrl = '/update/entity/'+data.docID+'/'+data.word+'/'+data.value;
+            $.ajax({
+                url: postDataUrl,
+                type: 'POST',
+                data: data,
+                dataType: 'JSON',
+                success: (result) => {   
+                    if(result.status === 200){
+                        getDoc(data.docID);
+                    } else if (result.status === 400){
+                        alert(result.failed);
+                    }
+                }
+            });             
+        }      
     }
-
 }
 
 function getDocuments() {

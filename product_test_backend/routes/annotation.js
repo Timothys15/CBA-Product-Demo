@@ -7,6 +7,7 @@ var dbName = 'testing';     // Database Name, change this to the name of your lo
 var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
 const fetch = require("node-fetch");
+var path = require('path');
 
 var app = express();
 
@@ -14,7 +15,7 @@ app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 
 app.get('/annotate', function (req, res) {
-    res.sendFile(__dirname + '/document_annotate.html');
+    res.sendFile(path.join(__dirname, '../views', '/document_annotate.html'));
 });
 
 app.get('/getAllDocuments', function (req, res) {
@@ -30,7 +31,6 @@ app.get('/getAllDocuments', function (req, res) {
             client.close();
         });
     });
-
 })
 
 app.get('/document/:id', function (req, res) {
@@ -72,7 +72,7 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
                     );
                 });
             } else {
-                console.log("something happened");
+                res.end('{"failed" : "Unable to find the word given, please try again", "status" : 400}');
             }
         })
         .then(function () { 
