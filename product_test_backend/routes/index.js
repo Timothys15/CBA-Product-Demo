@@ -7,10 +7,8 @@ var dbName = 'testing';     // Database Name, change this to the name of your lo
 var collectionOne = 'Create_Model_Collection';
 var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
-const fetch = require("node-fetch");
 var path = require('path');
 
-var fs = require('fs');
 var Tokenizr = require('tokenizr');
 
 var app = express();
@@ -109,6 +107,7 @@ app.post('/add-document', function (req, res) {
     console.log("The information entered is: ", req.body);
     var item = {
         model_id: req.body.model_id,
+        document_name: " ",
         plain_text: req.body.plain_text,
         tokenized_text: tokenizeDocument(req.body.plain_text)
     };
@@ -168,21 +167,6 @@ function tokenizeDocument(inputDoc) {
     console.log(tokenizedDoc);
     saveToDoc(tokenizedDoc);
     return tokenizedDoc;
-}
-
-function saveToDoc(data) {
-
-    var logger = fs.createWriteStream('log.txt', {
-        flags: 'a' // 'a' means appending (old data will be preserved)
-    });
-
-    for (var i = 0; i < data.length; i++) {
-        if (i === data.length - 1) {
-            logger.write("\r\n");
-        } else {
-            logger.write(data[i].substr(0, data[i].length - 1) + "\r\n");
-        }
-    }
 }
 
 function getDetails() {
