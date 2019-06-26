@@ -8,6 +8,7 @@ var collectionTwo = 'add_Document_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
 const fetch = require("node-fetch");
 var path = require('path');
+var fs = require('fs');
 
 var app = express();
 
@@ -18,15 +19,25 @@ app.get('/annotate', function (req, res) {
     res.sendFile(path.join(__dirname, '../views', '/document_annotate.html'));
 });
 
-app.get('/getAllDocuments', function (req, res) {
-
+app.post('/generate-model/:id', function (req, res) {
+    var model_id = req.params.id;
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var db = client.db(dbName);
-
-        db.collection(`${collectionTwo}`).find({}, { projection: { _id: 1, model_id: 1 } }).toArray(function (err, document) {
+        db.collection(`${collectionTwo}`).find({ model_id: model_id }, { projection: { tokenized_text: [] } }).toArray(function (err, document) {
             if (err) throw err;
+            saveToDoc(document);
+            client.close();
+        });
+    });
+})
 
+app.get('/getAllDocuments', function (req, res) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        assert.equal(null, err);
+        var db = client.db(dbName);
+        db.collection(`${collectionTwo}`).find({}, { projection: { _id: 1, model_id: 1, document_name: "" } }).toArray(function (err, document) {
+            if (err) throw err;
             res.send(JSON.stringify(document));
             client.close();
         });
@@ -35,7 +46,6 @@ app.get('/getAllDocuments', function (req, res) {
 
 app.get('/document/:id', function (req, res) {
     var docId = req.params.id;
-    console.log(docId);
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var db = client.db(dbName);
@@ -64,18 +74,18 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
                 MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
 
                     var db = client.db(dbName);
-                    var setIndex = "tokenized_text."+index;
-                    var toUpdate = docInfo.word+"\t"+docInfo.value;
+                    var setIndex = "tokenized_text." + index;
+                    var toUpdate = docInfo.word + "\t" + docInfo.value;
                     db.collection(`${collectionTwo}`).updateOne(
                         { "_id": new ObjectId(docInfo.docID) },
-                        { $set: { [setIndex] : toUpdate} }
+                        { $set: { [setIndex]: toUpdate } }
                     );
                 });
             } else {
                 res.end('{"failed" : "Unable to find the word given, please try again", "status" : 400}');
             }
         })
-        .then(function () { 
+        .then(function () {
             res.end('{"success" : "Updated Successfully", "status" : 200}');
         })
         .catch(err => console.error(err));
@@ -84,10 +94,29 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
 function findWord(text, word) {
     for (var i = 0; i < text.length; i += 1) {
         if (text[i]["id"] === word) {
-            return i-1;
+            return i - 1;
         }
     }
     return -1;
+}
+
+function saveToDoc(text) {
+    var d = new Date();
+    dd = d.toDateString();
+    var logger = fs.createWriteStream(dd + ' - model-1.txt', {
+        flags: 'w' // 'a' means appending (old data will be preserved)
+    });
+
+    for (var i = 0; i < text.length; i++) {
+        for (var j = 0; j < text[i].tokenized_text.length; j++) {
+            if (text[i].tokenized_text[j] === "\tEOF") {
+                logger.write("\r\n");
+            } else {
+                logger.write(text[i].tokenized_text[j] + "\r\n");
+            }
+        }
+    }
+    logger.close;
 }
 
 module.exports = app;

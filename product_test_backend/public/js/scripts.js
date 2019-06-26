@@ -1,5 +1,22 @@
+function generateModel(){
+    const model_id = "1";
+    var generateModelUrl = '/generate-model/' + model_id;
+    $.ajax({
+        url: generateModelUrl,
+        type: 'POST',
+        dataType: 'JSON',
+        success: (result) => {
+            if (result.status === 200) {
+                alert(result.status);
+            } else if (result.status === 400) {
+                alert(result.failed);
+            }
+        }
+    });
+}
+
 function updateTextArea(data) {
-    const { _id, model_id, plain_text, tokenized_text } = data;
+    const { _id, model_id, document_name, plain_text, tokenized_text } = data;
 
     var builtText = "";
     tokenized_text.forEach(element => {
@@ -21,7 +38,7 @@ function updateTextArea(data) {
     result =
         //TODO: change this all to appending to the DOM instead of hard coded
         `<div> 
-                    <h4 class="text-center" id="docName" value=${_id}>${model_id}</h4>
+                    <h4 class="text-center" id="docName" value=${_id}>${document_name}</h4>
                     <br />
                     <p id="textDisplayed">${builtText}</p>
                 </div>`;
@@ -29,41 +46,41 @@ function updateTextArea(data) {
 }
 
 function match() {
-    if(!document.getElementById("docName")){
+    if (!document.getElementById("docName")) {
         alert("Please choose a document first");
-    } else if (document.getElementById("word").value === ''){
+    } else if (document.getElementById("word").value === '') {
         alert("Please pick a word to assign an entity to");
     } else {
         var wordList = document.getElementById("word").value.match(/[-+]?[0-9]\.?[0-9]+|\w+|\S/g);
-        
-        if(wordList.length === 1){
+
+        if (wordList.length === 1) {
             var data = {
                 docID: document.getElementById("docName").getAttribute("value"),
                 docName: document.getElementById("docName").innerHTML,
                 word: document.getElementById("word").value,
                 value: document.getElementById("entitySelect").value,
             }
-            var postDataUrl = '/update/entity/'+data.docID+'/'+data.word+'/'+data.value;
+            var postDataUrl = '/update/entity/' + data.docID + '/' + data.word + '/' + data.value;
             $.ajax({
                 url: postDataUrl,
                 type: 'POST',
                 data: data,
                 dataType: 'JSON',
-                success: (result) => {   
-                    if(result.status === 200){
+                success: (result) => {
+                    if (result.status === 200) {
                         getDoc(data.docID);
-                    } else if (result.status === 400){
+                    } else if (result.status === 400) {
                         alert(result.failed);
                     }
                 }
-            });             
-        }      
+            });
+        }
     }
 }
 
 function getDocuments() {
     $.ajax({
-        url: 'getAllDocuments',
+        url: '../getAllDocuments',
         type: 'GET',
         dataType: 'JSON',
         success: (data) => {
@@ -73,7 +90,7 @@ function getDocuments() {
             data.forEach(element => {
                 var newRow = document.createElement("tr");
                 var newDocNameCol = document.createElement("th");
-                var docName = document.createTextNode(element.model_id);
+                var docName = document.createTextNode(element.document_name);
                 newDocNameCol.appendChild(docName);
                 newRow.appendChild(newDocNameCol);
 
@@ -91,14 +108,14 @@ function getDocuments() {
     });
 }
 
-$(function() {
-    $(document).on("click", '#docButt[value]', function() {
+$(function () {
+    $(document).on("click", '#docButt[value]', function () {
         getDoc(this.value);
     });
 });
 
 function getDoc(doc) {
-    var getDataUrl = "document/" + doc;
+    var getDataUrl = "../document/" + doc;
     $.ajax({
         url: getDataUrl,
         type: 'GET',
