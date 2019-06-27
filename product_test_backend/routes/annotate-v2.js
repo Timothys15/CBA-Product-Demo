@@ -15,12 +15,12 @@ var app = express();
 app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 
-app.get('/annotate', function (req, res) {
-    res.sendFile(path.join(__dirname, '../views', '/document_annotate.html'));
+app.get('/annotate/v2', function (req, res) {
+    res.sendFile(path.join(__dirname, '../views', '/doc_annotate_v2.html'));
 });
 
 
-app.post('/generate-model/:id', function (req, res) {
+app.post('/v2/generate-model/:id', function (req, res) {
     var model_id = req.params.id;
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
@@ -33,7 +33,7 @@ app.post('/generate-model/:id', function (req, res) {
     });
 })
 
-app.get('/getAllDocuments', function (req, res) {
+app.get('/v2/getAllDocuments', function (req, res) {
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
         var db = client.db(dbName);
@@ -45,7 +45,7 @@ app.get('/getAllDocuments', function (req, res) {
     });
 })
 
-app.get('/document/:id', function (req, res) {
+app.get('/v2/document/:id', function (req, res) {
     var docId = req.params.id;
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
@@ -65,7 +65,7 @@ app.get('/document/:id', function (req, res) {
     });
 })
 
-app.post('/update/entity/:id/:word/:entity', function (req, res) {
+app.post('/v2/update/entity/:id/:word/:entity', function (req, res) {
     var docInfo = req.body;
     fetch(`http://127.0.0.1:8080/document/${docInfo.docID}`)
         .then(res => res.json())

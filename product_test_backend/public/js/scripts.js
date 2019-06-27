@@ -1,6 +1,6 @@
 function generateModel(){
     const model_id = "1";
-    var generateModelUrl = '/generate-model/' + model_id;
+    var generateModelUrl = ( window.location.pathname ==='/annotate' ) ? '/generate-model/' + model_id : '/v2/generate-model/' + model_id;
     $.ajax({
         url: generateModelUrl,
         type: 'POST',
@@ -60,7 +60,7 @@ function match() {
                 word: document.getElementById("word").value,
                 value: document.getElementById("entitySelect").value,
             }
-            var postDataUrl = '/update/entity/' + data.docID + '/' + data.word + '/' + data.value;
+            var postDataUrl = ( window.location.pathname ==='/annotate' ) ? '/update/entity/' + data.docID + '/' + data.word + '/' + data.value : '/v2/update/entity/' + data.docID + '/' + data.word + '/' + data.value;
             $.ajax({
                 url: postDataUrl,
                 type: 'POST',
@@ -79,8 +79,11 @@ function match() {
 }
 
 function getDocuments() {
+
+    var url = ( window.location.pathname ==='/annotate' ) ? '../getAllDocuments' : '../v2/getAllDocuments';
+
     $.ajax({
-        url: '../getAllDocuments',
+        url: url,
         type: 'GET',
         dataType: 'JSON',
         success: (data) => {
@@ -125,3 +128,9 @@ function getDoc(doc) {
         }
     });
 }
+
+/* ----------- Version 2 functions -------------- */
+
+$(function () {
+    
+})
