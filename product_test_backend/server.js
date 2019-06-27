@@ -18,12 +18,11 @@ function listening() {
 }
 app.use(require('./routes/index'));
 app.use(require('./routes/annotation'));
+app.use(require('./routes/annotate-v2'));
 
 app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 app.use("/public", express.static('./public'));
-
-
 
 //DB connect
 MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {

@@ -107,7 +107,7 @@ app.post('/add-document', function (req, res) {
     console.log("The information entered is: ", req.body);
     var item = {
         model_id: req.body.model_id,
-        document_name: " ",
+        document_name: req.body.doc_name,
         plain_text: req.body.plain_text,
         tokenized_text: tokenizeDocument(req.body.plain_text)
     };
@@ -165,7 +165,6 @@ function tokenizeDocument(inputDoc) {
     });
 
     console.log(tokenizedDoc);
-    saveToDoc(tokenizedDoc);
     return tokenizedDoc;
 }
 
