@@ -70,20 +70,48 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
     fetch(`http://127.0.0.1:8080/document/${docInfo.docID}`)
         .then(res => res.json())
         .then(function (data) {
-            var index = findWord(data.tokenized_text, docInfo.word);
-            if (index != -1) {
-                MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
 
-                    var db = client.db(dbName);
-                    var setIndex = "tokenized_text." + index;
-                    var toUpdate = docInfo.word + "\t" + docInfo.value;
-                    db.collection(`${collectionTwo}`).updateOne(
-                        { "_id": new ObjectId(docInfo.docID) },
-                        { $set: { [setIndex]: toUpdate } }
-                    );
-                });
+            var wordList = docInfo.word;
+
+            //If there is only 1 word to be updated
+            if (wordList.length === 1) {
+                var index = findWord(data.tokenized_text, docInfo.word);
+                if (index != -1) {
+                    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+
+                        var db = client.db(dbName);
+                        var setIndex = "tokenized_text." + index;
+                        var toUpdate = docInfo.word + "\t" + docInfo.value;
+                        db.collection(`${collectionTwo}`).updateOne(
+                            { "_id": new ObjectId(docInfo.docID) },
+                            { $set: { [setIndex]: toUpdate } }
+                        );
+                    });
+                } else {
+                    res.end('{"failed" : "Unable to find the word given, please try again", "status" : 400}');
+                }
             } else {
-                res.end('{"failed" : "Unable to find the word given, please try again", "status" : 400}');
+                // Minus 1 to offset off by 1 error...
+                var indexOfFirstWord = (findWordList(data.tokenized_text, wordList))-1;
+                console.log(indexOfFirstWord);
+                if (indexOfFirstWord != -1) {
+                    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+
+                        var db = client.db(dbName);
+                        for (var i = 0; i < wordList.length; i++) {
+                            var index = indexOfFirstWord + i;
+                            var setIndex = "tokenized_text." + (index);
+                            console.log(setIndex);
+                            var toUpdate = wordList[i] + "\t" + docInfo.value;
+                            db.collection(`${collectionTwo}`).updateOne(
+                                { "_id": new ObjectId(docInfo.docID) },
+                                { $set: { [setIndex]: toUpdate } }
+                            );
+                        }
+                    });
+                } else {
+                    res.end('{"failed" : "Unable to find the given word pattern, please try again", "status" : 400}');
+                }
             }
         })
         .then(function () {
@@ -91,6 +119,33 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
         })
         .catch(err => console.error(err));
 })
+
+function findWordList(text, wordList) {
+
+    // Really cool function. map() checks each iteration for the equality of e and wordList[0]. If
+    // they match the index is returned, otherwise the result is set to an empty string. The .filter then
+    // ensures the output result only contains strings and are not empty
+    var indices = text.map((e, i) => e.id === wordList[0] ? i : '').filter(String)
+
+    var count = 0;
+    for (var i = 0; i < indices.length; i++) {
+        for (var e = 0; e < wordList.length; e++) {
+            var temp = indices[i];
+            temp += e;
+            if (text[temp]["id"] === wordList[e]) {
+                count++;
+                console.log("index: " + temp + "   word at index: " + text[temp]["id"] + "  wordList " + wordList[e]);
+            }
+            if (count === wordList.length) {
+                console.log("count: " + count + "  wordlist length: " + wordList.length);
+                return indices[i];
+            }
+        }
+        count = 0;
+    }
+    return -1;
+
+}
 
 function findWord(text, word) {
     for (var i = 0; i < text.length; i += 1) {
@@ -105,7 +160,7 @@ function saveToDoc(text) {
     var d = new Date();
     dd = d.toDateString();
     var logger = fs.createWriteStream(dd + ' - model-1.txt', {
-        flags: 'w' // 'a' means appending (old data will be preserved)
+        flags: 'w'
     });
 
     for (var i = 0; i < text.length; i++) {
