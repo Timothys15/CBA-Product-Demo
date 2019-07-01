@@ -52,15 +52,14 @@ function match() {
         alert("Please pick a word to assign an entity to");
     } else {
         var wordList = document.getElementById("word").value.match(/[-+]?[0-9]\.?[0-9]+|\w+|\S/g);
-
-        if (wordList.length === 1) {
+        // console.log(wordList);
             var data = {
                 docID: document.getElementById("docName").getAttribute("value"),
                 docName: document.getElementById("docName").innerHTML,
-                word: document.getElementById("word").value,
+                word: wordList,
                 value: document.getElementById("entitySelect").value,
             }
-            var postDataUrl = ( window.location.pathname ==='/annotate' ) ? '/update/entity/' + data.docID + '/' + data.word + '/' + data.value : '/v2/update/entity/' + data.docID + '/' + data.word + '/' + data.value;
+            var postDataUrl = ( window.location.pathname ==='/annotate' ) ? '/update/entity/' + data.docID + '/' + data.wordList + '/' + data.value : '/v2/update/entity/' + data.docID + '/' + data.wordList + '/' + data.value;
             $.ajax({
                 url: postDataUrl,
                 type: 'POST',
@@ -74,7 +73,6 @@ function match() {
                     }
                 }
             });
-        }
     }
 }
 
