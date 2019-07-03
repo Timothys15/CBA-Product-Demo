@@ -17,7 +17,7 @@ app.use(bodyParser.json()); // Parse input text to JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Ensure proper/safe URL encoding
 
 app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname , '../views','/index.html'));
+    res.sendFile(path.join(__dirname, '../views', '/index.html'));
 });
 
 app.get('/get-service1-data', function (req, res) {
@@ -112,6 +112,8 @@ app.post('/add-document', function (req, res) {
         tokenized_text: tokenizeDocument(req.body.plain_text)
     };
 
+    console.log(item.tokenized_text);
+
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
 
@@ -146,6 +148,7 @@ function tokenizeDocument(inputDoc) {
         ctx.accept("0")
     })
 
+
     let cfg = inputDoc;
     lexer.input(cfg);
 
@@ -164,7 +167,6 @@ function tokenizeDocument(inputDoc) {
         tokenizedDoc.push(tempToken); //Push into array
     });
 
-    console.log(tokenizedDoc);
     return tokenizedDoc;
 }
 
