@@ -23,13 +23,13 @@ function updateTextArea(data) {
 
     //Gets the avaliable entity selections from the webpage. Need the Value and Colour value from them
     var entityColours = document.getElementById("entitySelect").children;
-
+    console.log(entityColours);
     //For each element in the tokenized text document we need to loop through them and assign
     //a highlighted colour if they have been annotated
     tokenized_text.forEach(element => {
 
         //Loop through the entity elements from the html page
-        for(var i = 0; i < entityColours.length; i++){
+        for (var i = 0; i < entityColours.length; i++) {
             if (element.value == entityColours[i].getAttribute("value")) {
 
                 //Sets the background of the word, to the colour attribted to the entity
@@ -38,7 +38,7 @@ function updateTextArea(data) {
 
                 //If no entity is set, just set it plainl
                 // TODO: Make this a conditional before starting loop - speed up the process
-            }if (i === entityColours.length-1) {
+            } if (i === entityColours.length - 1) {
                 builtText += (" " + element.id);
             }
         }
@@ -171,6 +171,35 @@ function getDoc(doc) {
     });
 }
 
+function createNewEntity() {
+    if (document.getElementById("newEntity").value === '') {
+        alert("Please enter a new entity first");
+        return;
+    }
+    var newEntity = document.getElementById("newEntity").value.match(/[-+]?[0-9]\.?[0-9]+|\w+|\S/g);
+    if (newEntity.length > 1) {
+        alert("Please only enter a single word for a new entity");
+        return;
+    }
+    var entityColour = $("#customColourPicker").spectrum("get").toHex().toUpperCase();
+    addNewEntity(newEntity[0], entityColour);
+}
+
+function addNewEntity(newEntity, colour) {
+
+    const entityDropDown = document.getElementById("entitySelect");
+    console.log(newEntity);
+    var newOption = document.createElement("option");
+    newOption.id = newEntity.toUpperCase();
+    newOption.innerHTML = newEntity.toUpperCase();
+    newOption.value = newEntity.toUpperCase();
+    newOption.setAttribute("colour", colour);
+    entityDropDown.insertBefore(newOption, entityDropDown.firstChild);
+}
+
+$("#customColourPicker").spectrum({
+    color: "#f00"
+});
 /* ----------- Version 2 functions -------------- */
 
 $(function () {
