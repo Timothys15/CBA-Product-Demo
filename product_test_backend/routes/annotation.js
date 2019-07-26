@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 var assert = require('assert');
 var dbName = 'testing';     // Database Name, change this to the name of your local MongoDB database
 var collectionTwo = 'add_Document_Collection';
-var collectionOne = 'model';
+var collectionOne = 'add_Model_Collection';
 var url = `mongodb://localhost:27017/${dbName}`;
 const fetch = require("node-fetch");
 var path = require('path');
@@ -20,7 +20,9 @@ app.get('/annotate', function (req, res) {
     res.sendFile(path.join(__dirname, '../views', '/document_annotate.html'));
 });
 
-
+/* This request will generate a text document when the button is pressed on the page.
+It will grab the tokenized text from each docuemtn related to a model - Call the saveToDoc function
+which will output it in a Stanford NER friendly way */
 app.post('/generate-model/:id', function (req, res) {
     var model_id = req.params.id;
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
@@ -34,6 +36,7 @@ app.post('/generate-model/:id', function (req, res) {
     });
 })
 
+//Gets all the documents that are against a model
 app.get('/getAllDocuments', function (req, res) {
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
         assert.equal(null, err);
@@ -49,6 +52,7 @@ app.get('/getAllDocuments', function (req, res) {
     });
 })
 
+//Gets a document with a given ID
 app.get('/document/:id', function (req, res) {
     var docId = req.params.id;
     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
@@ -69,6 +73,35 @@ app.get('/document/:id', function (req, res) {
     });
 })
 
+//Addding a new entity if it is already not present within the
+app.post('/addEntity/:entity/:colour', function (req, res) {
+    var entityListSize;
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+        assert.equal(null, err);
+        var db = client.db(dbName);
+        
+        db.collection(`${collectionOne}`).findOne({entity_list: {$elemMatch: {entity: req.params.entity} } }, function (err, document) {
+        
+            if (err) throw err;
+
+            if (document === null){
+                db.collection(`${collectionOne}`).findOne({"model_id": "1"}, function (err1, doc1) {
+                    entityListSize = doc1.entity_list.length;
+                    
+                    MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
+                        var db2 = client.db(dbName);
+                        db2.collection(`${collectionOne}`).updateOne( { "model_id": "1"}, 
+                        { $set: { ["entity_list." + entityListSize] : { "entity" : req.params.entity, "colour": req.params.colour }}});   
+                    });       
+               });        
+            }
+            // console.log(document);
+            client.close();
+        });
+    });
+
+})
+
 /* Updates a document given the specified word and entity set */
 app.post('/update/entity/:id/:word/:entity', function (req, res) {
 
@@ -79,15 +112,16 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
         .then(function (data) {
 
             var wordList = docInfo.word;
-            console.log(req.body);
+            // console.log(req.body);
             //If there is only 1 word to be updated
             if (wordList.length === 1) {
 
-                if (wordList[0] == "\""){
+                //Configure backslash if present
+                if (wordList[0] == "\"") {
                     wordList[0] = "\\\"";
                 }
-                var index = findWord(data.tokenized_text, wordList[0] );
-                if (index != -1) {
+                var index = findWord(data.tokenized_text, wordList[0]);
+                if (index != -1) { 
                     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
 
                         var db = client.db(dbName);
@@ -103,16 +137,16 @@ app.post('/update/entity/:id/:word/:entity', function (req, res) {
                 }
             } else {
                 // Need handle contractions when entered to be annotated
-                for(var j = 0; j < wordList.length; j++){
-                    if(wordList[j] == "'"){
+                for (var j = 0; j < wordList.length; j++) {
+                    if (wordList[j] == "'") {
                         // Set [we,',ve] to [we've]
-                        wordList[j-1] += wordList[j] + wordList[j+1];
-                        wordList.splice(j,j+1);
+                        wordList[j - 1] += wordList[j] + wordList[j + 1];
+                        wordList.splice(j, j + 1);
                     }
                 }
 
                 // Minus 1 to offset off by 1 error...
-                var indexOfFirstWord = (findWordList(data.tokenized_text, wordList))-1;
+                var indexOfFirstWord = (findWordList(data.tokenized_text, wordList)) - 1;
                 console.log(indexOfFirstWord);
                 if (indexOfFirstWord >= 0) {
                     MongoClient.connect(url, { useNewUrlParser: true }, function (err, client) {
