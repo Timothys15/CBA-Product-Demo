@@ -101,7 +101,7 @@ function getDocuments() {
         type: 'GET',
         dataType: 'JSON',
         success: (data) => {
-
+            console.log(data);
             //The entity list from the model is attached to the JSON object as the first element
             //Its poped off to make for easier usage
             var entityList = data.pop();
@@ -195,6 +195,16 @@ function addNewEntity(newEntity, colour) {
     newOption.value = newEntity.toUpperCase();
     newOption.setAttribute("colour", colour);
     entityDropDown.insertBefore(newOption, entityDropDown.firstChild);
+
+    var newEntityUrl = "../addEntity/" + newEntity + "/" + colour;
+    $.ajax({
+        url: newEntityUrl,
+        type: 'POST',
+        dataType: 'JSON',
+        success: (data) => {
+            console.log("success");
+        }
+    });
 }
 
 $("#customColourPicker").spectrum({
