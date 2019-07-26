@@ -1,7 +1,7 @@
 /* This function is responisble for calling the generate model api */
 function generateModel() {
     const model_id = "1";
-    var generateModelUrl = (window.location.pathname === '/annotate') ? '/generate-model/' + model_id : '/v2/generate-model/' + model_id;
+    var generateModelUrl = '/generate-model/' + model_id;
     $.ajax({
         url: generateModelUrl,
         type: 'POST',
@@ -72,8 +72,7 @@ function match() {
             value: document.getElementById("entitySelect").value,
         }
 
-        //TODO: finish version 2..
-        var postDataUrl = (window.location.pathname === '/annotate') ? '/update/entity/' + data.docID + '/' + data.wordList + '/' + data.value : '/v2/update/entity/' + data.docID + '/' + data.wordList + '/' + data.value;
+        var postDataUrl = '../update/entity/' + data.docID + '/' + data.wordList + '/' + data.value;
         $.ajax({
             url: postDataUrl,
             type: 'POST',
@@ -94,7 +93,7 @@ function match() {
 document avalibale to be annotated */
 function getDocuments() {
 
-    var url = (window.location.pathname === '/annotate') ? '../getAllDocuments' : '../v2/getAllDocuments';
+    var url = '../getAllDocuments';
 
     $.ajax({
         url: url,
@@ -202,7 +201,7 @@ function addNewEntity(newEntity, colour) {
         type: 'POST',
         dataType: 'JSON',
         success: (data) => {
-            console.log("success");
+            console.log(data.success);
         }
     });
 }
@@ -210,8 +209,3 @@ function addNewEntity(newEntity, colour) {
 $("#customColourPicker").spectrum({
     color: "#f00"
 });
-/* ----------- Version 2 functions -------------- */
-
-$(function () {
-
-})

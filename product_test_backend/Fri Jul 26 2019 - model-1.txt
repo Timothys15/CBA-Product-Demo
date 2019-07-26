@@ -1,7 +1,7 @@
 "	PERSON
 makes	LOCATION
 it	0
-surprisingly	0
+surprisingly	PERSON
 surprisingly	PERSON
 easy	PERSON
 companies	0
@@ -18,11 +18,11 @@ obtaining	0
 detail	0
 on	0
 employee	PERSON
-behaviors	0
+behaviors	RET
 and	0
 interactions	0
 .	0
-Yet	0
+Yet	FDFSD
 no	0
 employer	PERSON
 wants	0
@@ -223,9 +223,9 @@ that	0
 excel	0
 at	0
 using	0
-new	0
-data	0
-sources	0
+new	RET
+data	RET
+sources	RET
 and	0
 tools	0
 to	0
