@@ -144,10 +144,9 @@ function tokenizeDocument(inputDoc) {
     lexer.rule(/[ \t\r\n]+/, (ctx, match) => { //ignore space, new lines, tabs, returns
         ctx.ignore()
     })
-    lexer.rule(/./, (ctx, match) => { // chars
+    lexer.rule(/[.,\/#!$%^&*;:{}=\-_`~()@+\[\]\'\"?<>|\\]/, (ctx, match) => { // chars
         ctx.accept("0")
     })
-
 
     let cfg = inputDoc;
     lexer.input(cfg);
