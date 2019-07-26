@@ -61,6 +61,11 @@ function match() {
     } else if (document.getElementById("word").value === '') {
         alert("Please pick a word to assign an entity to");
     } else {
+
+
+
+
+        
         //Get the words that have been input by the user
         var wordList = document.getElementById("word").value.match(/[-+]?[0-9]\.?[0-9]+|\w+|\S/g);
 
@@ -209,3 +214,16 @@ function addNewEntity(newEntity, colour) {
 $("#customColourPicker").spectrum({
     color: "#f00"
 });
+
+function getSelectionText() {
+    var text = "";
+    if (window.getSelection) {
+        text = window.getSelection().toString();
+        document.getElementById("word").value = text;
+    }
+    return text;
+}
+
+document.onmouseup = document.onselectionchange = function() {
+  getSelectionText();
+};
