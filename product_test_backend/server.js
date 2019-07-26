@@ -23,7 +23,6 @@ app.listen(PORT, () => console.log(`Server is running on port ${PORT} at 'http:/
 } */
 app.use(require('./routes/index'));
 app.use(require('./routes/annotation'));
-app.use(require('./routes/annotate-v2'));
 
 mongoose
     .connect(

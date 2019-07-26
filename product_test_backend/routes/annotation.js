@@ -92,6 +92,8 @@ app.post('/addEntity/:entity/:colour', function (req, res) {
                         var db2 = client.db(dbName);
                         db2.collection(`${collectionOne}`).updateOne( { "model_id": "1"}, 
                         { $set: { ["entity_list." + entityListSize] : { "entity" : req.params.entity, "colour": req.params.colour }}});   
+
+                        res.end('{"Success" : "Added new entity + colour into DB", "status" : 200}');
                     });       
                });        
             }
@@ -104,7 +106,7 @@ app.post('/addEntity/:entity/:colour', function (req, res) {
 
 /* Updates a document given the specified word and entity set */
 app.post('/update/entity/:id/:word/:entity', function (req, res) {
-
+    console.log("Here");
     var docInfo = req.body;
     //Fetches a document
     fetch(`http://127.0.0.1:8080/document/${docInfo.docID}`)
